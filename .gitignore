@@ -7,3 +7,8 @@ Personal/
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/*
+.settings/
+.cproject
+.mxproject
+.osx.project
+.project
