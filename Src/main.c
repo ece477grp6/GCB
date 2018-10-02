@@ -130,10 +130,10 @@ void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim){
 }
 void HAL_UART_RxCpltCallback (UART_HandleTypeDef *huart){
   if(huart->Instance==USART1){
-    GPS_RxCpltCallback();
+	  GPS_RxCpltCallback();
   }
-	else if(huart->Instance==USART2){
-		temp[temp_num] = TCP_temp;
+  if(huart->Instance==USART2){
+	  	temp[temp_num] = TCP_temp;
 		temp_num++;
 		if(temp_num>29){
 			temp_num = 0;
@@ -225,6 +225,7 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 	  HAL_UART_Receive_IT(&huart2, &TCP_temp,sizeof(TCP_temp));
+	  GPS_Check();
 
 	  if(send_ready){
 		  HAL_UART_Transmit(&huart2, AT_CIPSEND, sizeof(AT_CIPSEND), 1000);
@@ -234,7 +235,7 @@ int main(void)
 		  send_ready = false;
 	  }
 
-    GPS_Check();
+
   }
   /* USER CODE END 3 */
 
