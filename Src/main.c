@@ -1,7 +1,8 @@
+
 /**
   ******************************************************************************
-  * File Name          : main.c
-  * Description        : Main program body
+  * @file           : main.c
+  * @brief          : Main program body
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -55,7 +56,7 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 int time = 1;
-int escLimit = 7;
+int escLimit = 9;
 uint8_t OK[] = "OK";
 uint8_t AT[] = "AT\r\n\n";
 uint8_t AT_RST[] = "AT+RST\r\n\n";
@@ -63,7 +64,6 @@ uint8_t AT_CIPMUX[] = "AT+CIPMUX=1\r\n\n";
 uint8_t AT_CIPSERVER[] = "AT+CIPSERVER=1\r\n\n";
 uint8_t AT_CIPSEND[] = "AT+CIPSEND=0,25\r\n\n";
 uint8_t AT_CIPCLOSE[] = "AT+CIPCLOSE=0\r\n\n";
-//uint8_t send_message[] = "<html><head><title></title></head><body>Happy Mid Autumn Festival</body></html>";
 uint8_t send_message[] = "Happy Mid Autumn Festival";
 uint8_t RST_RSV[526];
 uint8_t CIPMUX_RSV[32];
@@ -102,13 +102,15 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim){
 	if( htim->Instance==TIM1 ){
 
-		if((100-TIM2->CCR1)<escLimit){
-			TIM2->CCR1 -= 1;
-		}
-		else if((100-TIM2->CCR1)>escLimit){
+		if(TIM2->CCR1 < escLimit){
 			TIM2->CCR1 += 1;
+			TIM2->CCR4 += 1;
 		}
-		else{}
+		else if(TIM2->CCR1 > escLimit){
+			TIM2->CCR1 -= 1;
+			TIM2->CCR4 -= 1;
+		}
+
 		if(time>0){
 			time--;
 		}
@@ -155,9 +157,13 @@ void HAL_UART_RxCpltCallback (UART_HandleTypeDef *huart){
 
 /* USER CODE END 0 */
 
+/**
+  * @brief  The application entry point.
+  *
+  * @retval None
+  */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -186,14 +192,15 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
-
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);
 
   HAL_ADC_Start_DMA(&hadc1,ADC_value, 5);
 
-  TIM2->CCR1 = 100;
+  TIM2->CCR1 = 0;
+  TIM2->CCR4 = 0;
 
   GPS_Init();
 
@@ -241,8 +248,10 @@ int main(void)
 
 }
 
-/** System Clock Configuration
-*/
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
 
@@ -303,45 +312,43 @@ void SystemClock_Config(void)
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  file: The file name as string.
+  * @param  line: The line in file as a number.
   * @retval None
   */
-void _Error_Handler(char * file, int line)
+void _Error_Handler(char *file, int line)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
   }
-  /* USER CODE END Error_Handler_Debug */ 
+  /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
-
+#ifdef  USE_FULL_ASSERT
 /**
-   * @brief Reports the name of the source file and the source line number
-   * where the assert_param error has occurred.
-   * @param file: pointer to the source file name
-   * @param line: assert_param error line source number
-   * @retval None
-   */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
-
 }
-
-#endif
-
-/**
-  * @}
-  */ 
+#endif /* USE_FULL_ASSERT */
 
 /**
   * @}
-*/ 
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
