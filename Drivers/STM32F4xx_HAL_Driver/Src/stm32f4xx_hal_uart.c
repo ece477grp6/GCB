@@ -835,7 +835,6 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
       return HAL_ERROR;
     }
     
-
     /* Process Locked */
     __HAL_LOCK(huart);
     
