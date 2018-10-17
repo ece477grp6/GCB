@@ -48,29 +48,38 @@ uint8_t SM = 0x3f;
 uint8_t SB = 0x1f;
 uint8_t RT = 0xf0;
 uint8_t RM = 0x4f;
+uint8_t WR_GAIN_SEL[] = {0x60,0x00,0x5C,0x00};
+uint8_t WR_RES[] = {0x60,0x02,0xB4,0x08};
 uint8_t STATUS;
 uint8_t MEASURE[9];
-uint8_t MEASURE1[9];
-uint8_t temp_x[2];
-uint8_t temp_y[2];
-unsigned int x_value;
-unsigned int y_value;
+
+extern int x_value;
+extern int y_value;
 extern uint8_t GPS_rcv;
 
-
+void COMPASS_Init(){
+	  HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, WR_GAIN_SEL,sizeof(WR_GAIN_SEL),0xffff);
+	  HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, &STATUS,sizeof(STATUS),0xffff);
+	  HAL_Delay(1000);
+	  HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, WR_RES,sizeof(WR_RES),0xffff);
+	  HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, &STATUS,sizeof(STATUS),0xffff);
+}
 void SM_READ(){
 	if(GPS_rcv){
 		HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, &SM,sizeof(SM),0xffff);
 		HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, &STATUS,sizeof(STATUS),0xffff);
+		HAL_Delay(1000);
 		HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, &RM,sizeof(RM),0xffff);
 		HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, MEASURE,sizeof(MEASURE),0xffff);
 
-		memcpy(temp_x, &MEASURE[3], 2);
-		memcpy(temp_y, &MEASURE[5], 2);
-		x_value = (unsigned int)temp_x;
-		y_value = (unsigned int)temp_y;
-
-		GPS_rcv = 0;
+		x_value = MEASURE[3] * 256 + MEASURE[4];
+		if(x_value > 32767){
+			x_value -= 65536;
+		}
+		y_value = MEASURE[5] * 256 + MEASURE[6];
+		if(y_value > 32767){
+			y_value -= 65536;
+		}
 	}
 }
 
