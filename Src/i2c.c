@@ -43,6 +43,36 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN 0 */
+#define COMPASS_ADDRESS 0x18
+uint8_t SM = 0x3f;
+uint8_t SB = 0x1f;
+uint8_t RT = 0xf0;
+uint8_t RM = 0x4f;
+uint8_t STATUS;
+uint8_t MEASURE[9];
+uint8_t MEASURE1[9];
+uint8_t temp_x[2];
+uint8_t temp_y[2];
+unsigned int x_value;
+unsigned int y_value;
+extern uint8_t GPS_rcv;
+
+
+void SM_READ(){
+	if(GPS_rcv){
+		HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, &SM,sizeof(SM),0xffff);
+		HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, &STATUS,sizeof(STATUS),0xffff);
+		HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, &RM,sizeof(RM),0xffff);
+		HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, MEASURE,sizeof(MEASURE),0xffff);
+
+		memcpy(temp_x, &MEASURE[3], 2);
+		memcpy(temp_y, &MEASURE[5], 2);
+		x_value = (unsigned int)temp_x;
+		y_value = (unsigned int)temp_y;
+
+		GPS_rcv = 0;
+	}
+}
 
 /* USER CODE END 0 */
 

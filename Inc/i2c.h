@@ -62,7 +62,7 @@ extern void _Error_Handler(char *, int);
 void MX_I2C1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+void SM_READ(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

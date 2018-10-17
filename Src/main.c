@@ -63,6 +63,7 @@ int lspeed = 0;
 int rspeed = 0;
 uint8_t GPS_message[27] = {0};
 uint32_t ADC_value[14] = {0};
+uint8_t GPS_rcv = 0;
 
 /* USER CODE END PV */
 
@@ -150,6 +151,7 @@ int main(void)
   while (1)
   {
 	  GPS_Check();
+	  SM_READ();
 	  wifi_Check();
   }
   /* USER CODE END WHILE */

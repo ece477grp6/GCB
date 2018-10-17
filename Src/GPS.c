@@ -6,7 +6,7 @@
 
 #define	GPS_USART huart1
 uint8_t	GPS_Buffer[512];
-uint8_t GPS_rcv = 0;
+extern uint8_t GPS_rcv;
 
 extern uint8_t GPS_message[27];
 
@@ -34,7 +34,6 @@ void GPS_Check(void)
 			}
 		}
 		memset(GPS_Buffer,0,sizeof(GPS_Buffer));
-		GPS_rcv=0;
 	}
 	HAL_UART_Receive_IT(&GPS_USART,GPS_Buffer,512);
 }
