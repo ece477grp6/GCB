@@ -64,6 +64,8 @@ int rspeed = 0;
 uint8_t GPS_message[27] = {0};
 uint32_t ADC_value[14] = {0};
 uint8_t GPS_rcv = 0;
+int x_value;
+int y_value;
 
 /* USER CODE END PV */
 
@@ -143,6 +145,7 @@ int main(void)
   adc_Init();
   GPS_Init();
   wifi_Init();
+  COMPASS_Init();
 
   /* USER CODE END 2 */
 
