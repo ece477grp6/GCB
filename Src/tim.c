@@ -57,10 +57,10 @@ void pwm_CpltCallback(void)
 	else if(TIM3->CCR1 > lspeed){
 		TIM3->CCR1 -= 1;
 	}
-	if(TIM3->CCR1 < rspeed){
+	if(TIM3->CCR2 < rspeed){
 		TIM3->CCR2 += 1;
 	}
-	else if(TIM3->CCR1 > rspeed){
+	else if(TIM3->CCR2 > rspeed){
 		TIM3->CCR2 -= 1;
 	}
 }
@@ -109,9 +109,9 @@ void MX_TIM3_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 1250;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 0;
+  htim3.Init.Period = 100;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {

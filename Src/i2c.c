@@ -63,7 +63,9 @@ void COMPASS_Init(){
 	  HAL_Delay(1000);
 	  HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, WR_RES,sizeof(WR_RES),0xffff);
 	  HAL_I2C_Master_Receive(&hi2c1,COMPASS_ADDRESS, &STATUS,sizeof(STATUS),0xffff);
+	  y_value = 1;
 }
+
 void SM_READ(){
 	if(GPS_rcv){
 		HAL_I2C_Master_Transmit(&hi2c1,COMPASS_ADDRESS, &SM,sizeof(SM),0xffff);

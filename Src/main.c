@@ -61,7 +61,7 @@
 int time = 1;
 int lspeed = 0;
 int rspeed = 0;
-uint8_t GPS_message[27] = {0};
+uint8_t GPS_message[28];
 uint32_t ADC_value[14] = {0};
 uint8_t GPS_rcv = 0;
 int x_value;
@@ -81,13 +81,17 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim){
 	if( htim->Instance==TIM1 ){
 		pwm_CpltCallback();
-		if(time>0){
-			time--;
-		}
-		else{
+//		if(time>0){
+//			time--;
+//		}
+//		else{
 			HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
-			time = 1;
-		}
+			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_15,GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_SET);
+//			time = 1;
+//		}
 	}
 }
 
@@ -95,7 +99,7 @@ void HAL_UART_RxCpltCallback (UART_HandleTypeDef *huart){
   if(huart->Instance==USART1){
 	  GPS_RxCpltCallback();
   }
-  if(huart->Instance==USART2){
+  if(huart->Instance==USART3){
 	  wifi_RxCpltCallback();
   }
 }
@@ -139,7 +143,6 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI2_Init();
   MX_TIM3_Init();
-
   /* USER CODE BEGIN 2 */
   tim_Init();
   adc_Init();
@@ -183,14 +186,13 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 50;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -202,7 +204,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
