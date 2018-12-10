@@ -41,8 +41,6 @@
 #include "stm32f4xx_hal.h"
 #include "adc.h"
 #include "dma.h"
-#include "i2c.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -61,11 +59,11 @@
 int time = 1;
 int lspeed = 0;
 int rspeed = 0;
-uint8_t GPS_message[28];
+uint8_t GPS_message[33];
 uint32_t ADC_value[14] = {0};
 uint8_t GPS_rcv = 0;
-int x_value;
-int y_value;
+int x_value = 1;
+int y_value = 1;
 
 /* USER CODE END PV */
 
@@ -81,17 +79,7 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim){
 	if( htim->Instance==TIM1 ){
 		pwm_CpltCallback();
-//		if(time>0){
-//			time--;
-//		}
-//		else{
-			HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
-			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_15,GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_SET);
-//			time = 1;
-//		}
+		  HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 	}
 }
 
@@ -140,15 +128,18 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   MX_USART3_UART_Init();
-  MX_I2C1_Init();
-  MX_SPI2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_15,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_10,GPIO_PIN_SET);
   tim_Init();
   adc_Init();
   GPS_Init();
   wifi_Init();
-  COMPASS_Init();
+//  COMPASS_Init();
 
   /* USER CODE END 2 */
 
@@ -156,9 +147,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  GPS_Check();
-	  SM_READ();
 	  wifi_Check();
+	  GPS_Check();
+//	  SM_READ();
   }
   /* USER CODE END WHILE */
 

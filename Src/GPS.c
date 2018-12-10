@@ -8,12 +8,12 @@
 uint8_t	GPS_Buffer[512];
 extern uint8_t GPS_rcv;
 
-extern uint8_t GPS_message[28];
+extern uint8_t GPS_message[33];
 
 void GPS_Init(void)
 {
 //	memset(GPS_message,'0',sizeof(GPS_message));
-	strcpy(GPS_message, "4026.872,N,08652.031,E,022.4");
+	strcpy(GPS_message, "4026.87226,N,08652.02631,E,0.134\0");
 	HAL_UART_Receive_IT(&GPS_USART,GPS_Buffer,512);
 }
 
@@ -29,12 +29,13 @@ void GPS_Check(void)
 		str = strstr((char*)GPS_Buffer,"$GPRMC,");
 		if(str!=NULL)
 		{
-			memcpy( GPS_message, &str[17], 28);
-			GPS_message[28] = '\0';
+			memcpy( GPS_message, &str[19], 33);
+			GPS_message[32] = '\0';
 			if(!strstr((char*)GPS_message,",N,") && !strstr((char*)GPS_message,",S,")){
-				memset(GPS_message,'0',sizeof(GPS_message));
+				strcpy(GPS_message, "0000.00000,N,00000.00000,E,0.000\0");
 			}
 		}
+		GPS_rcv = 0;
 		memset(GPS_Buffer,0,sizeof(GPS_Buffer));
 	}
 	HAL_UART_Receive_IT(&GPS_USART,GPS_Buffer,512);

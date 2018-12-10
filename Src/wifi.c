@@ -11,15 +11,15 @@ uint8_t OK[] = "OK";
 uint8_t AT[] = "AT\r\n\n";
 uint8_t AT_RST[] = "AT+RST\r\n\n";
 uint8_t AT_CWMODE[] = "AT+CWMODE=1\r\n\n";
-uint8_t AT_CWJAP[] = "AT+CWJAP=\"TEAM6\",\"ECN\\\\477grp6\"\r\n\n";
-uint8_t AT_CIPMUX[] = "AT+CIPMUX=1\r\n\n";
-uint8_t AT_CIPSERVER[] = "AT+CIPSERVER=1\r\n\n";
-uint8_t AT_CIPSEND[] = "AT+CIPSEND=0,109\r\n\n";
+uint8_t AT_CWJAP[] = "AT+CWJAP=\"Qianli’s iPhone XSMax\",\"233333333\"\r\n\n";
+uint8_t AT_CIPSTART[] = "AT+CIPSTART=\"TCP\",\"73.103.73.130\",8687\r\n\n";
+uint8_t AT_CIPSEND[] = "AT+CIPSEND=112\r\n\n";
 uint8_t AT_CIPCLOSE[] = "AT+CIPCLOSE=0\r\n\n";
-uint8_t send_message[109];
+uint8_t send_message[112];
 
 uint8_t RST_RSV[526];
-uint8_t JAP_RSV[101];
+uint8_t JAP_RSV[126];
+uint8_t START_RSV[100];
 uint8_t CIPMUX_RSV[32];
 uint8_t CIPSERVER_RSV[38];
 bool reset_OK = false;
@@ -47,13 +47,11 @@ void wifi_Init(void)
 	  }
 	  HAL_Delay(1000);
 	  HAL_UART_Transmit(&wifi_USART, AT_CWMODE, sizeof(AT_CWMODE), 1000);
-	  HAL_Delay(5000);
+	  HAL_Delay(3000);
 	  HAL_UART_Transmit(&wifi_USART, AT_CWJAP, sizeof(AT_CWJAP), 1000);
-	  HAL_UART_Receive(&wifi_USART, JAP_RSV,sizeof(JAP_RSV),10000);
-	  HAL_UART_Transmit(&wifi_USART, AT_CIPMUX, sizeof(AT_CIPMUX), 1000);
-	  HAL_UART_Receive(&wifi_USART, CIPMUX_RSV,sizeof(CIPMUX_RSV),1000);
-	  HAL_UART_Transmit(&wifi_USART, AT_CIPSERVER, sizeof(AT_CIPSERVER), 1000);
-	  HAL_UART_Receive(&wifi_USART, CIPSERVER_RSV,sizeof(CIPSERVER_RSV),1000);
+	  HAL_UART_Receive(&wifi_USART, JAP_RSV,sizeof(JAP_RSV),8000);
+	  HAL_UART_Transmit(&wifi_USART, AT_CIPSTART, sizeof(AT_CIPSTART), 1000);
+	  HAL_UART_Receive(&wifi_USART, START_RSV,sizeof(START_RSV),1000);
 }
 
 void wifi_RxCpltCallback(void)
@@ -100,13 +98,17 @@ void wifi_Check(void)
 {
 	HAL_UART_Receive_IT(&wifi_USART, &TCP_temp,sizeof(TCP_temp));
 	if(send_ready){
-//		HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,GPIO_PIN_SET);
 		char lspeedstr[3];
 		char rspeedstr[3];
 		memcpy(lspeedstr, TCP_RSV, 2);
 		memcpy(rspeedstr, TCP_RSV+2, 2);
 		lspeed = atoi(lspeedstr);
 		rspeed = atoi(rspeedstr);
+		if(TCP_RSV[4] == '1'){
+			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_10,GPIO_PIN_SET);
+		}else{
+			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_10,GPIO_PIN_RESET);
+		}
 		HAL_UART_Transmit(&wifi_USART, AT_CIPSEND, sizeof(AT_CIPSEND), 1000);
 		HAL_Delay(1000);
 		format_msg();
